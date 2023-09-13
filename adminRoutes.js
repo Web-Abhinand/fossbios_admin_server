@@ -114,7 +114,6 @@ router.get('/leads', isAdmin, async (req, res) => {
 
 router.get('/admins', isAdmin, async (req, res) => {
   try {
-    // Check if the logged-in user is a super admin
     if (req.admin.email === 'superadmin@gmail.com') {
       const admins = await Admin.find({ role: 'admin',approved: false });
       res.status(200).json(admins);
@@ -127,6 +126,15 @@ router.get('/admins', isAdmin, async (req, res) => {
   }
 });
 
+router.get('/allusers', isAdmin, async (req, res) => {
+  try {
+    const users = await User.find(); // Remove the role filter
+    res.status(200).json(users);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Error retrieving users' });
+  }
+});
 
 router.put('/approve-admin/:adminId', isAdmin, async (req, res) => {
   try {
@@ -143,6 +151,21 @@ router.put('/approve-admin/:adminId', isAdmin, async (req, res) => {
     return res.status(200).json({ message: 'Admin approved' });
   } catch (err) {
     return res.status(500).json({ message: 'Error approving admin' });
+  }
+});
+
+router.put('/approve-lead/:leadId', isAdmin, async (req, res) => {
+  try {
+    const { leadId } = req.params;
+    const lead = await User.findById(leadId);
+    if(!lead){
+      return res.status(404).json({ message: 'Lead not found' });
+    }
+    lead.approved = true; // Approve the lead
+    await lead.save();
+    return res.status(200).json({ message: 'Lead approved' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Error approving lead' });
   }
 });
 
