@@ -35,7 +35,6 @@ router.post('/admin-signup', async (req, res) => {
   }
 });
 
-
 router.post('/admin-login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -115,7 +114,7 @@ router.get('/leads', isAdmin, async (req, res) => {
 router.get('/admins', isAdmin, async (req, res) => {
   try {
     if (req.admin.email === 'superadmin@gmail.com') {
-      const admins = await Admin.find({ role: 'admin',approved: false });
+      const admins = await Admin.find({ role: 'admin' });
       res.status(200).json(admins);
     } else {
       return res.status(403).json({ message: 'Permission denied' });
@@ -130,6 +129,7 @@ router.get('/allusers', isAdmin, async (req, res) => {
   try {
     const users = await User.find(); // Remove the role filter
     res.status(200).json(users);
+    console.log(users);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Error retrieving users' });
