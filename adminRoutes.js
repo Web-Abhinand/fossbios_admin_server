@@ -169,5 +169,21 @@ router.put('/approve-lead/:leadId', isAdmin, async (req, res) => {
   }
 });
 
+router.put('/approve-leave/:user_id/:index',isAdmin, async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const { index } = req.params;
+    const user = await User.findById(user_id);
+    if(!user){
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.leaveRequests[index].leaveApproved = true; // Approve the leave
+    await user.save();
+    return res.status(200).json({ message: 'Leave approved' });
+    
+  } catch (err) {
+    return res.status(500).json({ message: 'Error approving leave' });
+  }
+});
 
 module.exports = router;
